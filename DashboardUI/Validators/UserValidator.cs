@@ -10,37 +10,29 @@ namespace DashboardUI.Validators
 {
     public class UserValidator : AbstractValidator<User>
     {
-        public UserValidator(bool includerId, bool checkOthers)
+        public UserValidator()
         {
-            if (includerId)
-            {
-                RuleFor(p => p.UserId)
-                  .Must(BeAValidUserID).WithMessage("User with specified ID doesnt exist");
-            }
-            if (checkOthers)
-            {
-                RuleFor(p => p.FirstName)
-                  .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotEmpty().WithMessage("{PropertyName} is Empty")
-                  .Length(2, 50).WithMessage("Length ({TotalLength}) of {PropertyName} Invalid")
-                  .Must(BeAValidName).WithMessage("{PropertyName} Contains Invalid Characters");
+            RuleFor(p => p.FirstName)
+              .Cascade(CascadeMode.StopOnFirstFailure)
+              .NotEmpty().WithMessage("{PropertyName} is Empty")
+              .Length(2, 50).WithMessage("Length ({TotalLength}) of {PropertyName} Invalid")
+              .Must(BeAValidName).WithMessage("{PropertyName} Contains Invalid Characters");
 
-                RuleFor(p => p.LastName)
-                  .Cascade(CascadeMode.StopOnFirstFailure)
-                  .NotEmpty().WithMessage("{PropertyName} is Empty")
-                  .Length(2, 50).WithMessage("Length ({TotalLength}) of {PropertyName} Invalid")
-                  .Must(BeAValidName).WithMessage("{PropertyName} Contains Invalid Characters");
+            RuleFor(p => p.LastName)
+              .Cascade(CascadeMode.StopOnFirstFailure)
+              .NotEmpty().WithMessage("{PropertyName} is Empty")
+              .Length(2, 50).WithMessage("Length ({TotalLength}) of {PropertyName} Invalid")
+              .Must(BeAValidName).WithMessage("{PropertyName} Contains Invalid Characters");
 
-                RuleFor(p => p.PhoneNumber)
-                    .Cascade(CascadeMode.StopOnFirstFailure)
-                    .NotEmpty().WithMessage("{PropertyName} is Empty")
-                    .Must(BeAValidNumber).WithMessage("{PropertyName} must be a number");
+            RuleFor(p => p.PhoneNumber)
+                .Cascade(CascadeMode.StopOnFirstFailure)
+                .NotEmpty().WithMessage("{PropertyName} is Empty")
+                .Must(BeAValidNumber).WithMessage("{PropertyName} must be a number");
 
-                RuleFor(p => p.EmailAddress)
-                   .Cascade(CascadeMode.StopOnFirstFailure)
-                   .NotEmpty().WithMessage("{PropertyName} is Empty")
-                   .Must(BeAValidEmail).WithMessage("{PropertyName} is not a valid email address");
-            }
+            RuleFor(p => p.EmailAddress)
+               .Cascade(CascadeMode.StopOnFirstFailure)
+               .NotEmpty().WithMessage("{PropertyName} is Empty")
+               .Must(BeAValidEmail).WithMessage("{PropertyName} is not a valid email address");
         }
 
         protected bool BeAValidName(string name)
@@ -68,17 +60,6 @@ namespace DashboardUI.Validators
             }
         }
 
-        public bool BeAValidUserID(int userId)
-        {
-            UserRepository userRepo = new UserRepository();
-            var users = userRepo.GetAll();
-            List<int> Ids = new List<int>();
-            foreach (var item in users)
-            {
-                Ids.Add(item.UserId);
-            }
 
-            return Ids.Contains(userId);
-        }
     }
 }

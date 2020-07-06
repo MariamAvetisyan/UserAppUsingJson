@@ -2,10 +2,9 @@
 
 namespace DataAccess
 {
-    public interface IJsonWorker
+    public interface IJsonWorker : ISerializer
     {
-        void Serialize<T>(T t, string path);
-
-        T DeSerialize<T>(string jsonPath) where T : class;
+       // string Read(string path);
+       // void Save(string path, string json);
     }
 }

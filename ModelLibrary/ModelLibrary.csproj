@@ -64,10 +64,14 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Abstract\IUserRepository.cs" />
+    <Compile Include="Abstract\IBaseRepository.cs" />
+    <Compile Include="Abstract\IUserRepositoryXML.cs" />
+    <Compile Include="Abstract\IUserRepositoryJson.cs" />
     <Compile Include="Implementation\Types.cs" />
     <Compile Include="Implementation\User.cs" />
     <Compile Include="Implementation\UserRepository.cs" />
+    <Compile Include="Implementation\UserRepositoryWorkingWithXML.cs" />
+    <Compile Include="Implementation\UserRepositoryWorkingWithJson.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace ModelLibrary
 {
-    interface IUserRepository
+    public interface IBaseRepository<T>
     {
-        void AddUser(User user);
-        void Update(User user, int id);
+        bool IsValidId(int ID);
+        void AddUser(T entity);
+        void Update(T user, int id);
         void RemoveUser(int id);
         void RemoveAllUsers();
-        User GetUser(int id);
-        IEnumerable<User> GetAll();
+        T GetUser(int id);
+        IEnumerable<T> GetAll();
+        void Save();
     }
 }

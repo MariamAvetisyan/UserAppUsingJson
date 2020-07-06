@@ -4,14 +4,7 @@ using System.Text;
 
 namespace DataAccess
 {
-    public interface IXmlWorker
+    public interface IXmlWorker : ISerializer
     {
-        string Serialize<T>(T t);
-
-        T Deserilize<T>(string xml) where T : class;
-
-        string Read();
-
-        void Save(string xml, string path);
     }
 }

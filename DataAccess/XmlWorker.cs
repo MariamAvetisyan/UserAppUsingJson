@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 
 namespace DataAccess
 {
-    class XmlWorker: IXmlWorker
+    public class XmlWorker : IXmlWorker
     {
         private XDocument _document;
 
@@ -15,15 +15,18 @@ namespace DataAccess
         {
             if (!File.Exists(path))
             {
-                new XDocument(new XElement("Users")).Save(path);
+                new XDocument().Save(path);
             }
             _document = XDocument.Load(path);
         }
-
-        public T Deserilize<T>(string xml) where T : class
+        public XmlWorker()
+        {
+            _document = new XDocument();
+        }
+        public T DeSerialize<T>(string xml) where T : class
         {
             T t = null;
-            XmlSerializer serializer = new XmlSerializer(typeof(T), new XmlRootAttribute("Users"));
+            XmlSerializer serializer = new XmlSerializer(typeof(T));
 
             using (TextReader reader = new StringReader(xml))
             {
@@ -32,22 +35,6 @@ namespace DataAccess
 
             return t;
         }
-
-        public string Read()
-        {
-            string xml = _document.ToString();
-            return xml;
-        }
-
-        public void Save(string xml, string path)
-        {
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
-            File.AppendAllText(path, xml, Encoding.Unicode);
-        }
-
         public string Serialize<T>(T t)
         {
             string xml = string.Empty;
@@ -58,7 +45,6 @@ namespace DataAccess
                 serializer.Serialize(sw, t);
                 xml = sw.ToString();
             }
-
             return xml;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using DashboardUI.Validators;
+using DataAccess;
 using FluentValidation.Results;
 using ModelLibrary;
 using System;
@@ -16,12 +17,15 @@ namespace DashboardUI
     public partial class Dashboard : Form
     {
         BindingList<string> Data = new BindingList<string>();
-        UserRepository userRepository = new UserRepository();
+        ISerializer _serializer;
+        IBaseRepository<User> userRepository;
 
         public Dashboard()
         {
             InitializeComponent();
             GetOnlyButtons();
+            _serializer = new JsonWorker();
+            userRepository = new UserRepositoryWorkingWithJson(_serializer);
         }
 
         private void createButton_Click(object sender, EventArgs e)
@@ -70,7 +74,7 @@ namespace DashboardUI
             person.PhoneNumber = phoneNumberText.Text;
             person.EmailAddress = emailAddressText.Text;
 
-            UserValidator validator = new UserValidator(false, true);
+            UserValidator validator = new UserValidator();
 
             ValidationResult results = validator.Validate(person);
 
@@ -86,7 +90,7 @@ namespace DashboardUI
             else
             {
                 userRepository.AddUser(person);
-                userRepository.JsonSerialize();
+                userRepository.Save();
                 Data.Add("User is succesfully saved");
                 messageBox.DataSource = Data;
                 MessageBox.Show("Saved");
@@ -100,20 +104,18 @@ namespace DashboardUI
             int Id;
             if (int.TryParse(userIdText.Text, out Id))
             {
-                User user = new User() { UserId = Id };
-                UserValidator validator = new UserValidator(true, false);
-                ValidationResult results = validator.Validate(user);
-                if (results.IsValid == false)
-                {
-                    MessageBox.Show(results.Errors[0].ErrorMessage);
-                    GetOnlyButtons();
-                }
-                else
+                if (userRepository.IsValidId(Id))
                 {
                     userRepository.RemoveUser(Id);
+                    userRepository.Save();
                     Data.Clear();
                     messageBox.DataSource = Data;
                     MessageBox.Show("User is removed");
+                }
+                else
+                {
+                    MessageBox.Show("Invalid user ID");
+                    GetOnlyButtons();
                 }
             }
             else
@@ -133,7 +135,7 @@ namespace DashboardUI
                 PhoneNumber = phoneNumberText.Text,
                 EmailAddress = emailAddressText.Text
             };
-            UserValidator validator = new UserValidator(false, true);
+            UserValidator validator = new UserValidator();
             ValidationResult results = validator.Validate(userToEdit);
             if (results.IsValid == false)
             {
@@ -147,7 +149,7 @@ namespace DashboardUI
             else
             {
                 userRepository.Update(userToEdit, userToEdit.UserId);
-                userRepository.JsonSerialize();
+                userRepository.Save();
                 MessageBox.Show("User is edited");
             }
 
@@ -160,17 +162,10 @@ namespace DashboardUI
             int Id;
             if (int.TryParse(userIdText.Text, out Id))
             {
-                User user = new User() { UserId = Id };
-                UserValidator validator = new UserValidator(true, false);
-                ValidationResult results = validator.Validate(user);
-                if (results.IsValid == false)
+
+                if (userRepository.IsValidId(Id))
                 {
-                    MessageBox.Show(results.Errors[0].ErrorMessage);
-                    GetOnlyButtons();
-                }
-                else
-                {
-                    user = userRepository.GetUser(Id);
+                    var user = userRepository.GetUser(Id);
                     Data.Clear();
                     Data.Add(user.ToString());
                     messageBox.DataSource = Data;
@@ -179,6 +174,11 @@ namespace DashboardUI
                     phoneNumberText.Text = user.PhoneNumber;
                     emailAddressText.Text = user.EmailAddress;
                     GetModifyView();
+                }
+                else
+                {
+                    MessageBox.Show("Invalid user ID");
+                    GetOnlyButtons();
                 }
             }
             else
@@ -204,7 +204,7 @@ namespace DashboardUI
             if (dialogResult == DialogResult.Yes)
             {
                 userRepository.RemoveAllUsers();
-                userRepository.JsonSerialize();
+                userRepository.Save();
                 Data.Clear();
                 messageBox.DataSource = Data;
                 MessageBox.Show("All users are removed");

@@ -6,24 +6,22 @@ using DataAccess;
 
 namespace ModelLibrary
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : IBaseRepository<User>
     {
-        private readonly IXmlWorker _xmlWorker;
-        private readonly IJsonWorker _jsonWorker = new JsonWorker();
-        private readonly string _path;
-        private List<User> Users { get; set; }
+        public List<User> Users { get; set; }
 
-        public UserRepository(IXmlWorker xmlWorker)
+        public bool IsValidId(int ID)
         {
-            _xmlWorker = xmlWorker;
-            _path = ConfigurationManager.AppSettings["xmlPath"];
-            Users = _xmlWorker.Deserilize<List<User>>(_xmlWorker.Read());
-        }
+            List<int> Ids = new List<int>();
+            foreach (var item in Users)
+            {
+                Ids.Add(item.UserId);
+            }
 
+            return Ids.Contains(ID);
+        }
         public UserRepository()
         {
-            _path = ConfigurationManager.AppSettings["jsonPath"];
-            Users = _jsonWorker.DeSerialize<List<User>>(_path) ?? new List<User>();
         }
 
         public void AddUser(User user)
@@ -66,15 +64,8 @@ namespace ModelLibrary
 
         }
 
-        public void XMlSerialize()
+        public virtual void Save()
         {
-            string xml = _xmlWorker.Serialize<List<User>>(Users);
-            _xmlWorker.Save(xml, _path);
-        }
-
-        public void JsonSerialize()
-        {
-            _jsonWorker.Serialize<List<User>>(Users, _path);
         }
     }
 }
